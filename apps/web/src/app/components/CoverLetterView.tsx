@@ -7,13 +7,14 @@ import rehypeHighlight from "rehype-highlight";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { jsPDF } from "jspdf";
 import { withTheme } from "@rjsf/core";
-import { Theme as PrimeTheme } from "@rjsf/primereact";
+import { Theme as AntdTheme } from "@rjsf/antd";
 import type { RJSFSchema, UiSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
-import { Button } from "primereact/button";
-import { FileUpload } from "primereact/fileupload";
+import { Button, Upload } from "antd";
+import type { UploadProps } from "antd";
+import { CopyOutlined, FilePdfOutlined, FileWordOutlined } from "@ant-design/icons";
 
-const Form = withTheme(PrimeTheme);
+const Form = withTheme(AntdTheme);
 
 // Reference: https://github.com/CopilotKit/CopilotKit
 type UploadedFile = {
@@ -309,182 +310,176 @@ export function CoverLetterView() {
     URL.revokeObjectURL(url);
   }, [versions]);
 
+  const uploadProps: UploadProps = useMemo(
+    () => ({
+      multiple: true,
+      accept: ".txt,.pdf,text/plain,application/pdf",
+      showUploadList: false,
+      customRequest: ({ file, onSuccess, onError }) => {
+        if (!file) {
+          onError?.(new Error("No file selected."));
+          return;
+        }
+        handleFiles([file as File])
+          .then(() => onSuccess?.("ok"))
+          .catch((error) => onError?.(error as Error));
+      },
+    }),
+    [handleFiles],
+  );
+
   return (
-    <section className="w-full">
-      <div className="grid gap-8">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-semibold text-slate-900">Create Cover Letter</h1>
-                <p className="text-slate-600 mt-2">
-                  Provide role details and upload supporting documents to guide the cover letter agent.
-                </p>
-              </div>
-              <Button
-                label="Reset"
-                size="small"
-                outlined
-                onClick={resetContext}
-              />
-            </div>
+    <section className="section-stack">
+      <div className="card">
+        <div className="card-header">
+          <div>
+            <h1 className="card-title">Create Cover Letter</h1>
+            <p className="card-subtitle">
+              Provide role details and upload supporting documents to guide the cover letter agent.
+            </p>
           </div>
+          <Button onClick={resetContext}>Reset</Button>
+        </div>
+      </div>
 
-        <div className="grid gap-6">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <Form
-              schema={schema}
-              uiSchema={uiSchema}
-              formData={formData}
-              validator={validator}
-              onChange={(event) => {
-                const data = event.formData as Partial<CoverLetterState>;
-                setState((prev) => ({
-                  ...prev,
-                  companyName: data.companyName ?? "",
-                  roleTitle: data.roleTitle ?? "",
-                  jobSpec: data.jobSpec ?? "",
-                  relatedDocuments: data.relatedDocuments ?? "",
-                }));
-              }}
-              noHtml5Validate
-              showErrorList={false}
-            >
-              <div />
-            </Form>
-          </div>
+      <div className="section-stack">
+        <div className="card">
+          <Form
+            schema={schema}
+            uiSchema={uiSchema}
+            formData={formData}
+            validator={validator}
+            onChange={(event) => {
+              const data = event.formData as Partial<CoverLetterState>;
+              setState((prev) => ({
+                ...prev,
+                companyName: data.companyName ?? "",
+                roleTitle: data.roleTitle ?? "",
+                jobSpec: data.jobSpec ?? "",
+                relatedDocuments: data.relatedDocuments ?? "",
+              }));
+            }}
+            noHtml5Validate
+            showErrorList={false}
+          >
+            <div />
+          </Form>
+        </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900">Supporting files</h2>
-                <p className="text-sm text-slate-500">
-                  Upload text files, resumes, or project notes. Files are stored as text in the agent context.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <label className="sr-only" htmlFor="supportingFiles">
-                Supporting files
-              </label>
-              <FileUpload
-                name="supportingFiles"
-                mode="basic"
-                customUpload
-                auto
-                multiple
-                chooseLabel="Choose files"
-                accept=".txt,.pdf,text/plain,application/pdf"
-                uploadHandler={(event) => handleFiles(event.files)}
-              />
-            </div>
-
-            <div className="mt-4 space-y-2">
-              {(formState.uploadedFiles || []).length === 0 && (
-                <p className="text-sm text-slate-500">No files uploaded yet.</p>
-              )}
-              {formState.uploadedFiles.map((file) => (
-                <div
-                  key={file.name}
-                  className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2 text-sm text-slate-600"
-                >
-                  <span>{file.name}</span>
-                  <button
-                    type="button"
-                    className="text-xs text-slate-400 hover:text-slate-700"
-                    onClick={() => removeFile(file.name)}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 flex justify-end">
-              <Button
-                label="Generate cover letters now"
-                severity="secondary"
-                icon="pi pi-bolt"
-                onClick={handleGenerate}
-                disabled={isLoading || !canGenerate}
-              />
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900">Generated output</h2>
-                <p className="text-sm text-slate-500">
-                  Output appears here after the agent responds. Each version renders as a markdown-highlighted code block.
-                </p>
-              </div>
-              <div />
-            </div>
-
-            {isLoading && (
-              <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center gap-3">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-400 border-t-transparent" />
-                  <span className="text-sm font-medium text-slate-700">Generating…</span>
-                </div>
-                <div className="mt-2 text-xs text-slate-500">
-                  {threadId ? `Thread: ${threadId}` : "Waiting for agent response."}
-                </div>
-                {agent?.isRunning ? (
-                  <div className="mt-1 text-xs text-slate-500">Status: running</div>
-                ) : null}
-              </div>
-            )}
-
-            {!isLoading && versions.length < 3 ? (
-              <p className="mt-4 text-sm text-slate-500">
-                No complete cover letter set yet. Generate to see Version A, B, and C.
+        <div className="card">
+          <div className="card-header">
+            <div>
+              <h2 className="card-title">Supporting files</h2>
+              <p className="small-muted">
+                Upload text files, resumes, or project notes. Files are stored as text in the agent context.
               </p>
-            ) : null}
-
-            {!isLoading && versions.length >= 3 ? (
-              <div className="mt-6 grid gap-4">
-                {versions.map((version) => {
-                  const markdown = `\`\`\`markdown\n${version.body}\n\`\`\``;
-                  return (
-                    <div key={version.id} className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-semibold text-slate-700">{version.title}</h3>
-                        <Button
-                          label="Copy"
-                          icon="pi pi-copy"
-                          size="small"
-                          outlined
-                          onClick={() => handleCopy(version.body)}
-                        />
-                      </div>
-                      <div className="mt-3 text-sm text-slate-800 max-w-full overflow-x-auto">
-                        <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                          {markdown}
-                        </ReactMarkdown>
-                      </div>
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <Button
-                          label="Download PDF"
-                          icon="pi pi-file-pdf"
-                          size="small"
-                          severity="secondary"
-                          onClick={handleDownloadPdf}
-                        />
-                        <Button
-                          label="Download Word"
-                          icon="pi pi-file-word"
-                          size="small"
-                          outlined
-                          onClick={handleDownloadDocx}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : null}
+            </div>
           </div>
+
+          <div>
+            <label className="sr-only" htmlFor="supportingFiles">
+              Supporting files
+            </label>
+            <Upload {...uploadProps}>
+              <Button id="supportingFiles" type="default">
+                Choose files
+              </Button>
+            </Upload>
+          </div>
+
+          <div className="file-list">
+            {(formState.uploadedFiles || []).length === 0 && (
+              <p className="small-muted">No files uploaded yet.</p>
+            )}
+            {formState.uploadedFiles.map((file) => (
+              <div
+                key={file.name}
+                className="file-row"
+              >
+                <span>{file.name}</span>
+                <button
+                  type="button"
+                  className="file-remove"
+                  onClick={() => removeFile(file.name)}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="action-row">
+            <Button
+              type="primary"
+              onClick={handleGenerate}
+              disabled={isLoading || !canGenerate}
+            >
+              Generate cover letters now
+            </Button>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-header">
+            <div>
+              <h2 className="card-title">Generated output</h2>
+              <p className="small-muted">
+                Output appears here after the agent responds. Each version renders as a markdown-highlighted code block.
+              </p>
+            </div>
+            <div />
+          </div>
+
+          {isLoading && (
+            <div className="loader-card">
+              <div className="loader-row">
+                <span className="loader-dot" />
+                <span>Generating…</span>
+              </div>
+              <div className="small-muted">
+                {threadId ? `Thread: ${threadId}` : "Waiting for agent response."}
+              </div>
+              {agent?.isRunning ? (
+                <div className="small-muted">Status: running</div>
+              ) : null}
+            </div>
+          )}
+
+          {!isLoading && versions.length < 3 ? (
+            <p className="small-muted">
+              No complete cover letter set yet. Generate to see Version A, B, and C.
+            </p>
+          ) : null}
+
+          {!isLoading && versions.length >= 3 ? (
+            <div className="output-grid">
+              {versions.map((version) => {
+                const markdown = `\`\`\`markdown\n${version.body}\n\`\`\``;
+                return (
+                  <div key={version.id} className="output-card">
+                    <div className="output-header">
+                      <h3 className="output-title">{version.title}</h3>
+                      <Button size="small" icon={<CopyOutlined />} onClick={() => handleCopy(version.body)}>
+                        Copy
+                      </Button>
+                    </div>
+                    <div className="markdown-output">
+                      <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                        {markdown}
+                      </ReactMarkdown>
+                    </div>
+                    <div className="output-actions">
+                      <Button size="small" icon={<FilePdfOutlined />} onClick={handleDownloadPdf}>
+                        Download PDF
+                      </Button>
+                      <Button size="small" icon={<FileWordOutlined />} onClick={handleDownloadDocx}>
+                        Download Word
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
       </div>
     </section>

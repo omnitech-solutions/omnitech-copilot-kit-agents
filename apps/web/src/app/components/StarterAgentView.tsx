@@ -50,28 +50,27 @@ export function StarterAgentView({ themeColor }: { themeColor: string }) {
   return (
     <div
       style={{ backgroundColor: themeColor }}
-      className="min-h-[70vh] w-full rounded-3xl flex justify-center items-center flex-col transition-colors duration-300 p-6"
+      className="starter-shell"
     >
-      <div className="bg-white/20 backdrop-blur-md p-8 rounded-2xl shadow-xl max-w-2xl w-full">
-        <h1 className="text-4xl font-bold text-white mb-2 text-center">Proverbs</h1>
-        <p className="text-gray-200 text-center italic mb-6">
+      <div className="starter-card">
+        <h1 className="starter-title">Proverbs</h1>
+        <p className="starter-subtitle">
           This is a demonstrative page, but it could be anything you want! 🪁
         </p>
-        <hr className="border-white/20 my-6" />
-        <div className="flex flex-col gap-3">
+        <hr className="starter-divider" />
+        <div className="starter-list">
           {state.proverbs?.map((proverb, index) => (
             <div
               key={index}
-              className="bg-white/15 p-4 rounded-xl text-white relative group hover:bg-white/20 transition-all"
+              className="starter-item"
             >
-              <p className="pr-8">{proverb}</p>
+              <p>{proverb}</p>
               <button
                 onClick={() => setState({
                   ...state,
                   proverbs: state.proverbs?.filter((_, i) => i !== index),
                 })}
-                className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity
-                  bg-red-500 hover:bg-red-600 text-white rounded-full h-6 w-6 flex items-center justify-center"
+                className="starter-remove"
               >
                 ✕
               </button>
@@ -79,7 +78,7 @@ export function StarterAgentView({ themeColor }: { themeColor: string }) {
           ))}
         </div>
         {state.proverbs?.length === 0 && (
-          <p className="text-center text-white/80 italic my-8">
+          <p className="starter-empty">
             No proverbs yet. Ask the assistant to add some!
           </p>
         )}

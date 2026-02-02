@@ -20,7 +20,7 @@ vi.mock("katex", () => ({
 // Mock CSS modules
 vi.mock("*.module.css", () => ({}));
 
-// Mock PrimeReact CSS injection
+// Mock style injection
 beforeAll(() => {
   // Mock HTMLStyleElement to prevent CSS injection
   Object.defineProperty(HTMLStyleElement.prototype, 'textContent', {
@@ -256,10 +256,6 @@ process.on('uncaughtException', (error) => {
 });
 
 import "@testing-library/jest-dom";
-import PrimeReact from "primereact/api";
-
-PrimeReact.unstyled = true;
-PrimeReact.ripple = false;
 
 if (!globalThis.URL.createObjectURL) {
   globalThis.URL.createObjectURL = vi.fn(() => "blob:mock-url");

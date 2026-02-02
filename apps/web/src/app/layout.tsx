@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { ConfigProvider } from "antd";
 
 import "@copilotkit/react-ui/styles.css";
+import "antd/dist/reset.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,8 +17,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={"antialiased"}>
-        {children}
+      <body>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: "#6d28d9",
+              borderRadius: 10,
+            },
+          }}
+        >
+          {children}
+        </ConfigProvider>
       </body>
     </html>
   );

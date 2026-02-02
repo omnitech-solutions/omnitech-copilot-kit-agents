@@ -29,21 +29,26 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build) a
 pnpm install
 ```
 
-2. Set up your OpenAI API key:
+
+## 2. Set up Environment Variables
+
 ```bash
 cd apps/agent
-echo "OPENAI_API_KEY=your-openai-api-key-here" > .env
+cp .env.example .env
 ```
 
-Or use LM Studio locally (OpenAI-compatible server):
-```bash
-cd apps/agent
-cat <<'EOF' > .env
-OPENAI_BASE_URL=http://localhost:1234/v1
-OPENAI_MODEL=local-model-name
-LM_STUDIO_API_KEY=lm-studio
-EOF
-```
+### Connection Comparison
+
+ Aspect                  | External OpenAI Server              | LM Studio (Local)                          |
+-------------------------|-------------------------------------|--------------------------------------------|
+ Network                 | Internet required                   | Fully local                                |
+ Latency                 | Higher / variable                   | Low / deterministic                        |
+ Cost                    | Usage-based (API billing)           | Free (local compute only)                  |
+ API Key                 | `OPENAI_API_KEY`                    | Dummy key (e.g. `LM_STUDIO_API_KEY`)       |
+ Base URL                | Default OpenAI endpoint             | `http://localhost:1234/v1`                 |
+ Model selection         | OpenAI-managed models               | Locally loaded model in LM Studio          |
+ Offline development     | ❌                                   | ✅                                          |
+ Best use case            | Production, hosted inference        | Local dev, testing, MCP / tool workflows  |
 
 3. Start the development servers:
 ```bash

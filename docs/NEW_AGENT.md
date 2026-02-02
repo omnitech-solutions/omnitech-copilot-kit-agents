@@ -56,21 +56,21 @@ The `graphId` must match the key you added in `langgraph.json`.
 3. If you need custom backend endpoints (e.g. file parsing),
    create a route under `apps/web/src/app/api/`.
 
-## 5) If you use RJSF + PrimeReact forms
+## 5) If you use RJSF + Ant Design forms
 
-When using `@rjsf/primereact`, always provide the validator to avoid runtime errors:
+When using `@rjsf/antd`, always provide the validator to avoid runtime errors:
 
 ```ts
 import { withTheme } from "@rjsf/core";
-import { Theme as PrimeTheme } from "@rjsf/primereact";
+import { Theme as AntdTheme } from "@rjsf/antd";
 import validator from "@rjsf/validator-ajv8";
 
-const Form = withTheme(PrimeTheme);
+const Form = withTheme(AntdTheme);
 
 <Form schema={schema} uiSchema={uiSchema} formData={formData} validator={validator} />
 ```
 
-PrimeReact’s theme styles already include form styling; no custom CSS is required.
+Ant Design’s theme styles already include form styling; no custom CSS is required.
 
 ## 6) Update tests (recommended)
 

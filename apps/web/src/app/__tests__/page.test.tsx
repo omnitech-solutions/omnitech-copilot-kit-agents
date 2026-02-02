@@ -22,24 +22,6 @@ vi.mock("@copilotkit/react-ui", () => ({
   CopilotKitCSSProperties: {} as any,
 }));
 
-// Mock PrimeReact Dropdown
-vi.mock("primereact/dropdown", () => ({
-  Dropdown: ({ value, options, onChange, inputId, optionLabel, optionValue, className }: any) => (
-    <select 
-      data-testid={inputId}
-      value={value}
-      onChange={(e) => onChange({ value: e.target.value })}
-      className={className}
-    >
-      {options?.map((option: any) => (
-        <option key={option.value} value={option.value}>
-          {option[optionLabel]}
-        </option>
-      ))}
-    </select>
-  ),
-}));
-
 import Page from "../page";
 
 describe("CopilotKitPage", () => {

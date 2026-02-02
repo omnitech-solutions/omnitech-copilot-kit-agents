@@ -2,7 +2,7 @@
 
 import { CopilotKit, useCopilotAction } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
-import { Dropdown } from "primereact/dropdown";
+import { Select } from "antd";
 import { useMemo, useState } from "react";
 
 import { CoverLetterView } from "./components/CoverLetterView";
@@ -76,42 +76,40 @@ function CopilotWorkspace({
   return (
     <main
       style={{ "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties}
-      className="min-h-screen w-full bg-slate-50 text-slate-900"
+      className="app-shell"
     >
-      <header className="sticky top-0 z-20 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center gap-4 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white">
-                <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4">
+      <header className="app-header">
+        <div className="app-header-inner">
+          <div className="app-toolbar">
+            <span className="app-brand">
+              <span className="app-logo">
+                <svg viewBox="0 0 24 24" aria-hidden className="app-logo-icon">
                   <path
                     fill="currentColor"
                     d="M4 6.5C4 5.12 5.12 4 6.5 4h7c1.38 0 2.5 1.12 2.5 2.5v3.1l2.2 2.2a1 1 0 0 1 0 1.4l-2.2 2.2V17.5c0 1.38-1.12 2.5-2.5 2.5h-7C5.12 20 4 18.88 4 17.5zm2.5-.5a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5zM9 8h2v2H9zm0 4h2v2H9z"
                   />
                 </svg>
               </span>
-              CopilotKit
+              <span className="app-title">CopilotKit</span>
             </span>
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-slate-500" htmlFor="agent-select">
+            <div className="app-toolbar">
+              <label className="app-label" htmlFor="agent-select">
                 Agent / Task
               </label>
-              <Dropdown
-                inputId="agent-select"
+              <Select
+                id="agent-select"
                 value={activeAgent}
                 options={agentOptions}
-                optionLabel="label"
-                optionValue="value"
-                className="w-56"
-                onChange={(event) => onAgentChange(event.value as AgentOption)}
+                style={{ width: 220 }}
+                onChange={(value) => onAgentChange(value as AgentOption)}
               />
             </div>
           </div>
-          <div className="ml-auto text-sm font-medium text-slate-500">OmniTech Custom Agents</div>
+          <div className="app-header-tagline">OmniTech Custom Agents</div>
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-6xl px-6 py-8">
+      <div className="app-content">
         {activeAgent === "coverLetterAgent" ? (
           <CoverLetterView />
         ) : (
