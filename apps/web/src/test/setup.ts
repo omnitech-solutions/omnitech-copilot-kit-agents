@@ -20,6 +20,28 @@ vi.mock("katex", () => ({
 // Mock CSS modules
 vi.mock("*.module.css", () => ({}));
 
+// Mock PrimeReact CSS injection
+beforeAll(() => {
+  // Mock HTMLStyleElement to prevent CSS injection
+  Object.defineProperty(HTMLStyleElement.prototype, 'textContent', {
+    set: vi.fn(),
+    get: vi.fn(() => ''),
+  });
+  
+  // Mock createElement for style elements
+  const originalCreateElement = document.createElement;
+  document.createElement = vi.fn(function(this: Document, tagName: string) {
+    const element = originalCreateElement.call(this, tagName);
+    if (tagName.toLowerCase() === 'style') {
+      Object.defineProperty(element, 'textContent', {
+        set: vi.fn(),
+        get: vi.fn(() => ''),
+      });
+    }
+    return element;
+  });
+});
+
 // Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(() => null),
@@ -196,7 +218,9 @@ beforeAll(() => {
     if (
       typeof args[0] === 'string' &&
       (args[0].includes('act()') ||
-       args[0].includes('update inside a test was not wrapped'))
+       args[0].includes('update inside a test was not wrapped') ||
+       args[0].includes('Sourcemap for') ||
+       args[0].includes('points to missing source files'))
     ) {
       return;
     }

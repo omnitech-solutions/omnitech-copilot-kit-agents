@@ -1,12 +1,10 @@
 import { defineConfig } from "vitest/config";
-import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 export default defineConfig({
   resolve: {
     alias: {
-      "katex/dist/katex.min.css": fileURLToPath(
-        new URL("./src/test/styleStub.ts", import.meta.url),
-      ),
+      uuid: path.resolve(__dirname, "src/test/__mocks__/uuid.ts"),
     },
   },
   test: {
@@ -14,11 +12,17 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.tsx"],
-    css: true,
+    css: false,
+    logHeapUsage: false,
+    isolate: false,
   },
-  server: {
-    deps: {
-      inline: ["primereact", "@rjsf/primereact"],
-    },
+  define: {
+    'process.env.NODE_ENV': '"test"',
+  },
+  ssr: {
+    noExternal: true,
+  },
+  esbuild: {
+    sourcemap: false,
   },
 });
