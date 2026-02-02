@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx @langchain/langgraph-cli dev --port 8123 --no-browser"
+    "dev": "npx @langchain/langgraph-cli dev --port 8123 --no-browser",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -12,7 +13,8 @@
   "devDependencies": {
     "@types/html-to-text": "^9.0.4",
     "@types/node": "^22.9.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.9"
   },
   "dependencies": {
     "@copilotkit/sdk-js": "1.10.6",

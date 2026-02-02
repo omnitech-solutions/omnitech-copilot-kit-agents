@@ -18,7 +18,12 @@ const runtime = new CopilotRuntime({
       deploymentUrl: process.env.LANGGRAPH_DEPLOYMENT_URL || "http://localhost:8123",
       graphId: "starterAgent",
       langsmithApiKey: process.env.LANGSMITH_API_KEY || "",
-    })
+    }),
+    coverLetterAgent: new LangGraphAgent({
+      deploymentUrl: process.env.LANGGRAPH_DEPLOYMENT_URL || "http://localhost:8123",
+      graphId: "coverLetterAgent",
+      langsmithApiKey: process.env.LANGSMITH_API_KEY || "",
+    }),
   }
 });
 

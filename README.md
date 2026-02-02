@@ -20,7 +20,7 @@ This project is organized as a monorepo using [Turborepo](https://turbo.build) a
 
 - Node.js 18+
 - [pnpm](https://pnpm.io/installation) 9.15.0 or later
-- OpenAI API Key (for the LangGraph agent)
+- OpenAI API Key (for the LangGraph agent) or LM Studio running locally
 
 ## Getting Started
 
@@ -33,6 +33,16 @@ pnpm install
 ```bash
 cd apps/agent
 echo "OPENAI_API_KEY=your-openai-api-key-here" > .env
+```
+
+Or use LM Studio locally (OpenAI-compatible server):
+```bash
+cd apps/agent
+cat <<'EOF' > .env
+OPENAI_BASE_URL=http://localhost:1234/v1
+OPENAI_MODEL=local-model-name
+LM_STUDIO_API_KEY=lm-studio
+EOF
 ```
 
 3. Start the development servers:
@@ -82,6 +92,7 @@ The LangGraph agent code is in `apps/agent/src/`.
 - [CopilotKit Documentation](https://docs.copilotkit.ai) - Explore CopilotKit's capabilities
 - [LangGraph Documentation](https://langchain-ai.github.io/langgraph/) - Learn more about LangGraph and its features
 - [Next.js Documentation](https://nextjs.org/docs) - Learn about Next.js features and API
+- [Creating a New Agent](docs/NEW_AGENT.md) - Step-by-step guide for adding a new agent
 
 ## Contributing
 

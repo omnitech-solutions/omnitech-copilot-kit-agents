@@ -43,14 +43,38 @@ const getWeather = tool(
 // 4. Put our tools into an array
 const tools = [getWeather];
 
+function resolveModelConfig() {
+  const baseURL =
+    process.env.OPENAI_BASE_URL ?? process.env.LM_STUDIO_BASE_URL ?? undefined;
+  const apiKey =
+    process.env.OPENAI_API_KEY ?? process.env.LM_STUDIO_API_KEY ?? undefined;
+  const model =
+    process.env.OPENAI_MODEL ?? process.env.LLM_MODEL ?? "gpt-4o";
+
+  const useLocalFallbackKey =
+    !apiKey && !!baseURL && baseURL.includes("localhost");
+
+  return {
+    apiKey: apiKey ?? (useLocalFallbackKey ? "lm-studio" : undefined),
+    baseURL,
+    model,
+  };
+}
+
 // 5. Define the chat node, which will handle the chat logic
 async function chat_node(state: AgentState, config: RunnableConfig) {
   // 5.1 Define the model, lower temperature for deterministic responses
-  const model = new ChatOpenAI({ temperature: 0, model: "gpt-4o" });
+  const { apiKey, baseURL, model } = resolveModelConfig();
+  const modelClient = new ChatOpenAI({
+    temperature: 0,
+    model,
+    apiKey,
+    configuration: baseURL ? { baseURL } : undefined,
+  });
 
   // 5.2 Bind the tools to the model, include CopilotKit actions. This allows
   //     the model to call tools that are defined in CopilotKit by the frontend.
-  const modelWithTools = model.bindTools!([
+  const modelWithTools = modelClient.bindTools!([
     ...convertActionsToDynamicStructuredTools(state.copilotkit?.actions ?? []),
     ...tools,
   ]);
